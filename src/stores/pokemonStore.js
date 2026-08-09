@@ -1,31 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { getPokemonList, getPokemonByName } from "@/services/api";
-
-const STORAGE_KEY = "pokedex-list";
-
-const readStoredPokemons = () => {
-	if (typeof window === "undefined") return [];
-
-	try {
-		const stored = window.localStorage.getItem(STORAGE_KEY);
-		return stored ? JSON.parse(stored) : [];
-	} catch (err) {
-		console.warn("readStoredPokemons: failed to parse stored value", err);
-		return [];
-	}
-};
-
-const savePokemons = (pokemons) => {
-	if (typeof window === "undefined") return;
-	try {
-		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pokemons));
-	} catch (err) {
-		console.warn("savePokemons: failed to write to localStorage", err);
-	}
-};
+import { useLocalStorage } from "@/composables/useLocalStorage";
 
 export const usePokemonStore = defineStore("pokemon", () => {
+	const { read: readStoredPokemons, save: savePokemons } = useLocalStorage("pokedex-list", []);
+	
 	const pokemons = ref(readStoredPokemons());
 	const isLoading = ref(false);
 	const hasError = ref(false);

@@ -6,10 +6,9 @@
 		<div v-if="isLoading" class="text-center py-4">Cargando pokémons...</div>
 
 		<div v-else class="pokemon-grid">
-			<PokemonCard v-for="(pokemon, index) in pokemons" :key="pokemon.name" :id="index + 1" :name="pokemon.name" :types="pokemon.types" :sprite="pokemon.sprites.front_default"  />
+			<PokemonCard v-for="pokemon in pokemons" :key="pokemon.name" :pokemon="pokemon" />
 		</div>
 	</main>
-
 </template>
 
 <script setup>
@@ -21,7 +20,6 @@ import PokemonCard from "@/components/PokemonCard.vue";
 const pokemonStore = usePokemonStore();
 const { pokemons, isLoading } = storeToRefs(pokemonStore);
 const { fetchPokemons } = pokemonStore;
-
 
 onMounted(() => {
 	fetchPokemons();
