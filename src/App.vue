@@ -3,7 +3,13 @@
 	<main class="app-layout d-flex">
 		<NavDrawer />
 		<section class="app-content flex-fill p-3">
-			<ApiErrorState v-if="hasError" />
+			<EmptyState
+				v-if="hasError"
+				:showButton="true"
+				title="Algo salio mal..."
+				label="No pudimos cargar la información en este momento. Verifica tu conexión o intenta
+				nuevamente más tarde."
+			/>
 			<RouterView v-else />
 		</section>
 	</main>
@@ -15,7 +21,7 @@ import { RouterView } from "vue-router";
 import NavBar from "@/components/navigation/NavBar.vue";
 import NavDrawer from "@/components/navigation/NavDrawer.vue";
 
-import ApiErrorState from "@/components/ApiErrorState.vue";
+import EmptyState from "@/components/states/EmptyState.vue";
 import { usePokemonStore } from "@/stores/pokemonStore";
 
 const pokemonStore = usePokemonStore();
