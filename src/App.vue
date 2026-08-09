@@ -1,7 +1,7 @@
 <template>
-	<NavBar />
+	<NavBar :drawer-open="drawerOpen" @toggle-drawer="toggleDrawer" />
 	<main class="app-layout d-flex">
-		<NavDrawer />
+		<NavDrawer v-if="drawerVisible" />
 		<section class="app-content flex-fill p-3">
 			<EmptyState
 				v-if="hasError"
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import { RouterView } from "vue-router";
 import NavBar from "@/components/navigation/NavBar.vue";
@@ -26,6 +27,27 @@ import { usePokemonStore } from "@/stores/pokemonStore";
 
 const pokemonStore = usePokemonStore();
 const { hasError } = storeToRefs(pokemonStore);
+
+const windowWidth = ref(window.innerWidth);
+const drawerOpen = ref(false);
+const isMobile = computed(() => windowWidth.value <= 830);
+const drawerVisible = computed(() => !isMobile.value || drawerOpen.value);
+
+const handleResize = () => {
+	windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+	window.addEventListener("resize", handleResize);
+});
+
+onUnmounted(() => {
+	window.removeEventListener("resize", handleResize);
+});
+
+const toggleDrawer = () => {
+	drawerOpen.value = !drawerOpen.value;
+};
 </script>
 
 <style scoped>
@@ -36,7 +58,13 @@ const { hasError } = storeToRefs(pokemonStore);
 }
 
 .app-content {
-	margin-left: 280px;
+	margin-left: 200px;
 	background-color: #f8f9fa;
+}
+
+@media (max-width: 830px) {
+	.app-content {
+		margin-left: 0;
+	}
 }
 </style>

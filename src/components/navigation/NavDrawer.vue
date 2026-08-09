@@ -28,12 +28,13 @@ const links = ref({
 	top: 56px;
 	left: 0;
 	bottom: 0;
-	width: 280px;
+	width: 200px;
 	overflow-y: auto;
 	padding: 16px;
-	background-color: rgba(255, 255, 255, 0.94);
+	background-color: #fff;
 	border-right: 1px solid rgba(0, 0, 0, 0.08);
 	box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.04);
+	z-index: 3;
 }
 
 .nav-link {

@@ -63,11 +63,11 @@ const labelColor = (name) => {
 };
 
 const toggleFavorite = () => {
-	console.log(props.pokemon)
+	console.log(props.pokemon);
 	favoritesStore.toggleFavorite({
 		id: props.pokemon.id,
 		name: props.pokemon.name,
-		data: props.pokemon
+		data: props.pokemon,
 	});
 };
 </script>
@@ -83,7 +83,7 @@ const toggleFavorite = () => {
 	background-color: rgb(from v-bind(typesColors(pokemonColor)) r g b / 0.5);
 
 	padding: 16px;
-	min-height: 105px;
+	min-height: stretch;
 	width: 100%;
 }
 

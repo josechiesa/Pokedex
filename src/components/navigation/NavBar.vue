@@ -1,19 +1,60 @@
 <template>
-	<nav class="navbar navbar-expand-lg nav-bar-custom">
-		<div class="container-fluid align-items-center justify-content-center">
+	<nav class="container-fluid navbar navbar-expand-lg nav-bar-custom p-2">
+		<div class="d-flex align-content-center justify-content-center w-100">
+			<button
+				type="button"
+				class="btn btn-outline-secondary drawer-toggle me-2"
+				@click="$emit('toggle-drawer')"
+				:aria-expanded="drawerOpen"
+				aria-label="Alternar menú"
+			>
+				<i :class="['bi', drawerOpen ? 'bi-x' : 'bi-list']" aria-hidden="true"></i>
+			</button>
 			<router-link to="/" class="me-3 logo-link" aria-label="Ir al inicio">
-				<img src="/images/pokeball.webp" alt="Pokeball" width="32" height="32" class="logo" />
+				<img
+					src="/images/pokeball.webp"
+					alt="Pokeball"
+					width="32"
+					height="32"
+					class="logo"
+				/>
 			</router-link>
 			<form class="d-flex w-100 max-w-600" role="search">
-				<input class="form-control me-2" type="search" placeholder="Buscar pokémon..." aria-label="Search" />
+				<input
+					class="form-control me-2"
+					type="search"
+					placeholder="Buscar pokémon..."
+					aria-label="Search"
+				/>
 			</form>
 		</div>
 	</nav>
 </template>
 
-<script setup></script>
+<script setup>
+defineProps({
+	drawerOpen: {
+		type: Boolean,
+		default: false,
+	},
+});
+</script>
 
 <style scoped>
+.drawer-toggle {
+	display: none;
+	padding: 4px 8px;
+	font-size: 18px;
+	line-height: 1;
+}
+
+@media (max-width: 830px) {
+	.drawer-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+}
 .nav-bar-custom {
 	position: fixed;
 	top: 0;

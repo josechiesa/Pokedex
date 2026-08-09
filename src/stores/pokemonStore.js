@@ -5,8 +5,9 @@ import { useLocalStorage } from "@/composables/useLocalStorage";
 
 export const usePokemonStore = defineStore("pokemon", () => {
 	const { read: readStoredPokemons, save: savePokemons } = useLocalStorage("pokedex-list", []);
-	
-	const pokemons = ref(readStoredPokemons());
+
+	const storedPokemons = readStoredPokemons();
+	const pokemons = ref(Array.isArray(storedPokemons) ? storedPokemons : []);
 	const isLoading = ref(false);
 	const hasError = ref(false);
 	const pokemonColorMap = ref([
@@ -31,6 +32,10 @@ export const usePokemonStore = defineStore("pokemon", () => {
 	]);
 
 	const fetchPokemons = async () => {
+		if (pokemons.value.length > 0) {
+			return;
+		}
+
 		isLoading.value = true;
 		hasError.value = false;
 
@@ -42,7 +47,9 @@ export const usePokemonStore = defineStore("pokemon", () => {
 			const detailPromises = basicList.map((p) => getPokemonByName(p.name));
 			const settled = await Promise.allSettled(detailPromises);
 
-			const successful = settled.map((r) => (r.status === "fulfilled" ? r.value && r.value.data : null));
+			const successful = settled
+				.filter((r) => r.status === "fulfilled" && r.value && r.value.data)
+				.map((r) => r.value.data);
 
 			pokemons.value = successful;
 			savePokemons(pokemons.value);
