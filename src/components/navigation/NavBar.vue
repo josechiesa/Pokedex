@@ -1,0 +1,41 @@
+<template>
+	<nav class="navbar navbar-expand-lg nav-bar-custom">
+		<div class="container-fluid align-items-center justify-content-center">
+			<router-link to="/" class="me-3 logo-link" aria-label="Ir al inicio">
+				<img src="/images/pokeball.webp" alt="Pokeball" width="32" height="32" class="logo" />
+			</router-link>
+			<form class="d-flex w-100 max-w-600" role="search">
+				<input class="form-control me-2" type="search" placeholder="Buscar pokémon..." aria-label="Search" />
+			</form>
+		</div>
+	</nav>
+</template>
+
+<script setup></script>
+
+<style scoped>
+.nav-bar-custom {
+	background-color: rgba(255, 255, 255, 0.94);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+	min-height: 56px;
+}
+
+.max-w-600 {
+	max-width: 600px;
+}
+
+.form-control {
+	border-radius: 0.375rem;
+}
+
+.logo {
+	flex-shrink: 0;
+}
+
+.logo-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+</style>
