@@ -24,10 +24,13 @@ const { hasError } = storeToRefs(pokemonStore);
 
 <style scoped>
 .app-layout {
+	display: flex;
 	min-height: calc(100vh - 56px);
+	padding-top: 56px;
 }
 
 .app-content {
+	margin-left: 280px;
 	background-color: #f8f9fa;
 }
 </style>

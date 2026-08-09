@@ -24,9 +24,13 @@ const links = ref({
 
 <style lang="scss" scoped>
 .nav-drawer {
+	position: fixed;
+	top: 56px;
+	left: 0;
+	bottom: 0;
 	width: 280px;
-	min-height: calc(100vh - 56px);
-	padding: 1rem;
+	overflow-y: auto;
+	padding: 16px;
 	background-color: rgba(255, 255, 255, 0.94);
 	border-right: 1px solid rgba(0, 0, 0, 0.08);
 	box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.04);

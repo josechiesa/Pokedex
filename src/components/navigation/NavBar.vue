@@ -15,7 +15,12 @@
 
 <style scoped>
 .nav-bar-custom {
-	background-color: rgba(255, 255, 255, 0.94);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	background-color: rgba(255, 255, 255);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 	box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.04);
 	min-height: 56px;

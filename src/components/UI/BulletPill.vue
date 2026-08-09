@@ -14,15 +14,15 @@ import { defineAsyncComponent } from "vue";
 const props = defineProps({
 	label: {
 		type: String,
-		required: true,
+		default: "",
 	},
 	name: {
 		type: String,
-		required: true,
+		default: "",
 	},
 	color: {
 		type: String,
-		default: "red",
+		default: "",
 	},
 });
 
