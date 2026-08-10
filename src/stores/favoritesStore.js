@@ -9,8 +9,10 @@ export const useFavoritesStore = defineStore("favorites", () => {
 	);
 	const favorites = ref(readStoredFavorites());
 
+	// Checks if a pokemon id is currently in favorites.
 	const isFavorite = (id) => favorites.value.some((pokemon) => pokemon.id === id);
 
+	// Adds a pokemon to favorites and persists the updated list.
 	const addFavorite = (pokemon) => {
 		if (!pokemon) return;
 		if (!isFavorite(pokemon.id)) {
@@ -23,11 +25,13 @@ export const useFavoritesStore = defineStore("favorites", () => {
 		}
 	};
 
+	// Removes a pokemon from favorites by id and persists the updated list.
 	const removeFavorite = (id) => {
 		favorites.value = favorites.value.filter((pokemon) => pokemon.id !== id);
 		saveFavorites(favorites.value);
 	};
 
+	// Toggles favorite status for a pokemon.
 	const toggleFavorite = (pokemon) => {
 		if (!pokemon) return;
 
@@ -38,6 +42,7 @@ export const useFavoritesStore = defineStore("favorites", () => {
 		}
 	};
 
+	// Returns the total number of favorite pokemons.
 	const favoriteCount = computed(() => favorites.value.length);
 
 	return {

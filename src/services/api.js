@@ -17,6 +17,10 @@ export function getPokemonList(limit = 21, offset = 0) {
 	});
 }
 
+export function getPokemonListByUrl(url) {
+	return api.get(url);
+}
+
 export function getPokemonByName(name) {
 	return api.get(`/pokemon/${name}`);
 }

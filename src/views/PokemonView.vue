@@ -25,6 +25,19 @@
 					:pokemon="pokemon"
 				/>
 			</div>
+
+			<PaginationControls
+				v-if="totalPages > 1"
+				class="mt-4"
+				:current-page="currentPage"
+				:total-pages="totalPages"
+				:previous-page-url="previousPageUrl || ''"
+				:next-page-url="nextPageUrl || ''"
+				aria-label="Paginacion de pokemons"
+				@previous="goToPreviousPage"
+				@next="goToNextPage"
+				@go-page="goToPage"
+			/>
 		</template>
 	</main>
 </template>
@@ -38,10 +51,19 @@ import PokemonCard from "@/components/PokemonCard.vue";
 import DropDown from "@/components/UI/DropDown.vue";
 import BulletPill from "@/components/UI/BulletPill.vue";
 import PokeLoader from "@/components/UI/PokeLoader.vue";
+import PaginationControls from "@/components/UI/PaginationControls.vue";
 
 const pokemonStore = usePokemonStore();
-const { pokemons, isLoading, pokemonColorMap } = storeToRefs(pokemonStore);
-const { fetchPokemons } = pokemonStore;
+const {
+	pokemons,
+	isLoading,
+	pokemonColorMap,
+	nextPageUrl,
+	previousPageUrl,
+	currentPage,
+	totalPages,
+} = storeToRefs(pokemonStore);
+const { fetchPokemons, goToPage, goToNextPage, goToPreviousPage } = pokemonStore;
 
 const selectedTypes = ref([]);
 
@@ -62,7 +84,7 @@ const filteredPokemons = computed(() => {
 });
 
 onMounted(() => {
-	fetchPokemons();
+	fetchPokemons(102, 0);
 });
 </script>
 
