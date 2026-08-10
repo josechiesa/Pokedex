@@ -1,12 +1,6 @@
 <template>
 	<div class="pokemon-card">
-		<div
-			class="card-content"
-			data-bs-toggle="offcanvas"
-			data-bs-target="#offcanvasExample"
-			aria-controls="offcanvasExample"
-			@click="showInOffcanvas"
-		>
+		<div class="card-content" @click="showInOffcanvas">
 			<div class="card-header">
 				<span class="pokemon-id">#{{ formattedId }}</span>
 				<h2 class="pokemon-name">{{ pokemon.name }}</h2>
@@ -28,9 +22,6 @@
 			:name="pokemon.name"
 			:type="pokemon.types[0]?.type?.name"
 			:color="getTypeColor(pokemon.types[0]?.type?.name)"
-			data-bs-toggle="offcanvas"
-			data-bs-target="#offcanvasExample"
-			aria-controls="offcanvasExample"
 			@click="showInOffcanvas"
 		/>
 		<FavButoon :isFavorite="isFavorite" @toggle="toggleFavorite" />
@@ -44,6 +35,7 @@ import { useFavoritesStore } from "@/stores/favoritesStore";
 import BulletPill from "./UI/BulletPill.vue";
 import PokemonCardSprites from "./PokemonCardSprites.vue";
 import FavButoon from "./UI/FavButoon.vue";
+import { usePokemonOffcanvas } from "@/composables/usePokemonOffcanvas";
 const favoritesStore = useFavoritesStore();
 
 const pokemonStore = usePokemonStore();
@@ -56,6 +48,7 @@ const props = defineProps({
 });
 
 const pokemonColor = ref(props.pokemon.types[0]?.type?.name);
+const { showPokemonInOffcanvas } = usePokemonOffcanvas();
 
 const formattedId = computed(() => String(props.pokemon.id).padStart(3, "0"));
 const isFavorite = computed(() => favoritesStore.isFavorite(props.pokemon.id));
@@ -70,12 +63,7 @@ const toggleFavorite = () => {
 };
 
 const showInOffcanvas = () => {
-	// Dispatch a global event with the pokemon data for the offcanvas to consume
-	const event = new CustomEvent("show-offcanvas-pokemon", {
-		detail: { pokemon: props.pokemon },
-		bubbles: true,
-	});
-	document.dispatchEvent(event);
+	showPokemonInOffcanvas(props.pokemon);
 };
 </script>
 

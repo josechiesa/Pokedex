@@ -19,8 +19,9 @@
 					class="logo"
 				/>
 			</router-link>
-			<form class="d-flex w-100 max-w-600" role="search">
+			<form class="d-flex w-100 max-w-600" role="search" @submit.prevent="handleSearch">
 				<input
+					v-model="searchQuery"
 					class="form-control me-2"
 					type="search"
 					placeholder="Buscar pokémon..."
@@ -32,12 +33,28 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
+import { usePokemonStore } from "@/stores/pokemonStore";
+import { usePokemonOffcanvas } from "@/composables/usePokemonOffcanvas";
+
 defineProps({
 	drawerOpen: {
 		type: Boolean,
 		default: false,
 	},
 });
+
+const searchQuery = ref("");
+const pokemonStore = usePokemonStore();
+const { searchPokemon } = pokemonStore;
+const { showPokemonInOffcanvas } = usePokemonOffcanvas();
+
+const handleSearch = async () => {
+	const pokemon = await searchPokemon(searchQuery.value);
+	if (!pokemon) return;
+
+	showPokemonInOffcanvas(pokemon);
+};
 </script>
 
 <style scoped>

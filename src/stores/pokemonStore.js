@@ -143,6 +143,19 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		}
 	};
 
+	const searchPokemon = async (query = "") => {
+		const normalizedQuery = String(query).trim().toLowerCase().replace(/^#/, "");
+		if (!normalizedQuery) return null;
+
+		try {
+			const response = await getPokemonByName(normalizedQuery);
+			return response?.data || null;
+		} catch (err) {
+			console.error("searchPokemon error:", err);
+			return null;
+		}
+	};
+
 	return {
 		pokemons,
 		isLoading,
@@ -153,5 +166,6 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		getTypeLabel,
 		getTypeColor,
 		fetchPokemons,
+		searchPokemon,
 	};
 });

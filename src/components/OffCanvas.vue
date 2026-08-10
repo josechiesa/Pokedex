@@ -53,10 +53,7 @@
 						<hr />
 
 						<div>
-							<p v-if="speciesLoading" class="small text-muted">
-								Cargando descripción...
-							</p>
-							<p v-else-if="species && speciesText" class="small text-muted">
+							<p v-if="species && speciesText" class="small text-muted">
 								{{ speciesText }}
 							</p>
 
@@ -78,10 +75,7 @@
 								:items="genderItems"
 							/>
 
-							<div v-if="weaknessesLoading" class="small text-muted mt-3">
-								Cargando debilidades...
-							</div>
-							<div v-else-if="weaknesses.length" class="mt-3">
+							<div v-if="weaknesses.length" class="mt-3">
 								<p class="weakness-title mb-2">Debilidades</p>
 								<div class="type-list">
 									<BulletPill

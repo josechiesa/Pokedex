@@ -1,28 +1,31 @@
 <template>
 	<main>
-		<h1>Pokémons</h1>
-		<p>Explora la lista de pokémons y sus detalles.</p>
+		<template v-if="isLoading">
+			<PokeLoader :size="88" />
+		</template>
+		<template v-else>
+			<h1>Pokémons</h1>
+			<p>Explora la lista de pokémons y sus detalles.</p>
 
-		<div class="filter-bar">
-			<DropDown v-model="selectedTypes" :options="typeOptions" placeholder="Seleccione" />
-			<BulletPill
-				v-for="type in selectedTypeOptions"
-				:key="type.type"
-				:label="type.type"
-				:name="type.name"
-				:color="type.color"
-			/>
-		</div>
+			<div class="filter-bar">
+				<DropDown v-model="selectedTypes" :options="typeOptions" placeholder="Seleccione" />
+				<BulletPill
+					v-for="type in selectedTypeOptions"
+					:key="type.type"
+					:label="type.type"
+					:name="type.name"
+					:color="type.color"
+				/>
+			</div>
 
-		<div v-if="isLoading" class="text-center py-4">Cargando pokémons...</div>
-
-		<div v-else class="pokemon-grid">
-			<PokemonCard
-				v-for="pokemon in filteredPokemons"
-				:key="pokemon.name"
-				:pokemon="pokemon"
-			/>
-		</div>
+			<div class="pokemon-grid">
+				<PokemonCard
+					v-for="pokemon in filteredPokemons"
+					:key="pokemon.name"
+					:pokemon="pokemon"
+				/>
+			</div>
+		</template>
 	</main>
 </template>
 
@@ -34,6 +37,7 @@ import { usePokemonStore } from "@/stores/pokemonStore";
 import PokemonCard from "@/components/PokemonCard.vue";
 import DropDown from "@/components/UI/DropDown.vue";
 import BulletPill from "@/components/UI/BulletPill.vue";
+import PokeLoader from "@/components/UI/PokeLoader.vue";
 
 const pokemonStore = usePokemonStore();
 const { pokemons, isLoading, pokemonColorMap } = storeToRefs(pokemonStore);
