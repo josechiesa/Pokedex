@@ -8,13 +8,15 @@
 			<p class="mb-3">
 				{{ label }}
 			</p>
-			<BaseButton v-if="showButton" label="Reintentar" @click="retry" />
+			<BaseButton v-if="showButton" label="Reintentar" @click="emit('click')" />
 		</div>
 	</div>
 </template>
 
 <script setup>
 import BaseButton from "@/components/UI/BaseButton.vue";
+
+const emit = defineEmits(["click"]);
 
 defineProps({
 	showButton: {

@@ -9,6 +9,7 @@
 				title="Algo salio mal..."
 				label="No pudimos cargar la información en este momento. Verifica tu conexión o intenta
 				nuevamente más tarde."
+				@click="retry"
 			/>
 			<RouterView v-else />
 		</section>
@@ -44,6 +45,10 @@ onMounted(() => {
 onUnmounted(() => {
 	window.removeEventListener("resize", handleResize);
 });
+
+const retry = () => {
+	window.location.reload();
+};
 
 const toggleDrawer = () => {
 	drawerOpen.value = !drawerOpen.value;
