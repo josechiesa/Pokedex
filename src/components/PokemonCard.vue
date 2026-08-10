@@ -1,6 +1,12 @@
 <template>
 	<div class="pokemon-card">
-		<div class="card-content">
+		<div
+			class="card-content"
+			data-bs-toggle="offcanvas"
+			data-bs-target="#offcanvasExample"
+			aria-controls="offcanvasExample"
+			@click="showInOffcanvas"
+		>
 			<div class="card-header">
 				<span class="pokemon-id">#{{ formattedId }}</span>
 				<h2 class="pokemon-name">{{ pokemon.name }}</h2>
@@ -11,8 +17,8 @@
 					v-for="(type, index) in pokemon.types"
 					:key="index"
 					:label="type.type.name"
-					:name="labelColor(type.type.name)"
-					:color="typesColors(type.type.name)"
+					:name="getTypeLabel(type.type.name)"
+					:color="getTypeColor(type.type.name)"
 				/>
 			</div>
 		</div>
@@ -21,7 +27,11 @@
 			:sprite="pokemon.sprites.front_default"
 			:name="pokemon.name"
 			:type="pokemon.types[0]?.type?.name"
-			:color="typesColors(pokemon.types[0]?.type?.name)"
+			:color="getTypeColor(pokemon.types[0]?.type?.name)"
+			data-bs-toggle="offcanvas"
+			data-bs-target="#offcanvasExample"
+			aria-controls="offcanvasExample"
+			@click="showInOffcanvas"
 		/>
 		<FavButoon :isFavorite="isFavorite" @toggle="toggleFavorite" />
 	</div>
@@ -29,17 +39,15 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { storeToRefs } from "pinia";
-
 import { usePokemonStore } from "@/stores/pokemonStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import BulletPill from "./UI/BulletPill.vue";
 import PokemonCardSprites from "./PokemonCardSprites.vue";
 import FavButoon from "./UI/FavButoon.vue";
-const pokemonStore = usePokemonStore();
 const favoritesStore = useFavoritesStore();
-const { pokemonColorMap } = storeToRefs(pokemonStore);
 
+const pokemonStore = usePokemonStore();
+const { getTypeLabel, getTypeColor } = pokemonStore;
 const props = defineProps({
 	pokemon: {
 		type: Object,
@@ -52,16 +60,6 @@ const pokemonColor = ref(props.pokemon.types[0]?.type?.name);
 const formattedId = computed(() => String(props.pokemon.id).padStart(3, "0"));
 const isFavorite = computed(() => favoritesStore.isFavorite(props.pokemon.id));
 
-const typesColors = (types) => {
-	const color = pokemonColorMap.value.find((p) => p.type == types);
-	return color.color;
-};
-
-const labelColor = (name) => {
-	const label = pokemonColorMap.value.find((p) => p.type == name);
-	return label.name;
-};
-
 const toggleFavorite = () => {
 	console.log(props.pokemon);
 	favoritesStore.toggleFavorite({
@@ -69,6 +67,15 @@ const toggleFavorite = () => {
 		name: props.pokemon.name,
 		data: props.pokemon,
 	});
+};
+
+const showInOffcanvas = () => {
+	// Dispatch a global event with the pokemon data for the offcanvas to consume
+	const event = new CustomEvent("show-offcanvas-pokemon", {
+		detail: { pokemon: props.pokemon },
+		bubbles: true,
+	});
+	document.dispatchEvent(event);
 };
 </script>
 
@@ -80,11 +87,12 @@ const toggleFavorite = () => {
 	position: relative;
 	overflow: hidden;
 	border-radius: 16px;
-	background-color: rgb(from v-bind(typesColors(pokemonColor)) r g b / 0.5);
+	background-color: rgb(from v-bind(getTypeColor(pokemonColor)) r g b / 0.5);
 
 	padding: 16px;
 	min-height: stretch;
 	width: 100%;
+	cursor: pointer;
 }
 
 .card-content {

@@ -1,5 +1,10 @@
 <template>
-	<div class="favorite-btn" aria-label="Marcar favorito" @click="emit('toggle')">
+	<div
+		class="favorite-btn"
+		:class="{ 'favorite-btn--inline': !isAbsolute }"
+		aria-label="Marcar favorito"
+		@click="emit('toggle')"
+	>
 		<FavoriteIcon v-if="!isFavorite" />
 		<FavoriteActiveIcon v-else />
 	</div>
@@ -16,6 +21,10 @@ defineProps({
 		type: Boolean,
 		default: false,
 	},
+	isAbsolute: {
+		type: Boolean,
+		default: true,
+	},
 });
 </script>
 
@@ -29,5 +38,11 @@ defineProps({
 	position: absolute;
 	top: 8px;
 	right: 8px;
+}
+
+.favorite-btn--inline {
+	position: static;
+	top: auto;
+	right: auto;
 }
 </style>

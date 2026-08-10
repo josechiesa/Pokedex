@@ -21,4 +21,12 @@ export function getPokemonByName(name) {
 	return api.get(`/pokemon/${name}`);
 }
 
+export function getPokemonSpecies(name) {
+	return api.get(`/pokemon-species/${name}`);
+}
+
+export function getPokemonType(typeName) {
+	return api.get(`/type/${typeName}`);
+}
+
 export default api;

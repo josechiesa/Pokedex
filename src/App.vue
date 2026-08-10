@@ -14,6 +14,7 @@
 			<RouterView v-else />
 		</section>
 	</main>
+	<OffCanvas />
 </template>
 
 <script setup>
@@ -25,6 +26,7 @@ import NavDrawer from "@/components/navigation/NavDrawer.vue";
 
 import EmptyState from "@/components/states/EmptyState.vue";
 import { usePokemonStore } from "@/stores/pokemonStore";
+import OffCanvas from "@/components/OffCanvas.vue";
 
 const pokemonStore = usePokemonStore();
 const { hasError } = storeToRefs(pokemonStore);

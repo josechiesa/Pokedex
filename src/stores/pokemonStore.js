@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { getPokemonList, getPokemonByName } from "@/services/api";
+import {
+	getPokemonList,
+	getPokemonByName,
+	getPokemonSpecies as apiGetPokemonSpecies,
+	getPokemonType as apiGetPokemonType,
+} from "@/services/api";
 import { useLocalStorage } from "@/composables/useLocalStorage";
 
 export const usePokemonStore = defineStore("pokemon", () => {
@@ -30,6 +35,83 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		{ name: "Veneno", type: "poison", color: "#9C27B0" },
 		{ name: "Volador", type: "flying", color: "#00BCD4" },
 	]);
+
+	const species = ref({});
+	const typeDetails = ref({});
+	const weaknessesByPokemon = ref({});
+
+	const getPokemonSpecies = async (name = "") => {
+		if (!name) return null;
+		if (species.value[name]) return species.value[name];
+		try {
+			const resp = await apiGetPokemonSpecies(name);
+			const data = resp?.data ?? null;
+			species.value[name] = data;
+			return data;
+		} catch (err) {
+			console.error("getPokemonSpecies error:", err);
+			return null;
+		}
+	};
+
+	const getTypeLabel = (typeName = "") => {
+		return pokemonColorMap.value.find((item) => item.type === typeName)?.name || typeName;
+	};
+
+	const getTypeColor = (typeName = "") => {
+		return pokemonColorMap.value.find((item) => item.type === typeName)?.color || typeName;
+	};
+
+	const getTypeDetails = async (typeName = "") => {
+		if (!typeName) return null;
+		if (typeDetails.value[typeName]) return typeDetails.value[typeName];
+
+		try {
+			const resp = await apiGetPokemonType(typeName);
+			const data = resp?.data ?? null;
+			typeDetails.value[typeName] = data;
+			return data;
+		} catch (err) {
+			console.error("getTypeDetails error:", err);
+			return null;
+		}
+	};
+
+	const getPokemonWeaknesses = async (pokemon) => {
+		const pokemonName = pokemon?.name || "";
+		if (!pokemonName) return [];
+		if (weaknessesByPokemon.value[pokemonName]) return weaknessesByPokemon.value[pokemonName];
+
+		const pokemonTypes = (pokemon?.types || [])
+			.map((entry) => entry?.type?.name)
+			.filter(Boolean);
+
+		if (!pokemonTypes.length) {
+			weaknessesByPokemon.value[pokemonName] = [];
+			return [];
+		}
+
+		try {
+			const detailsList = await Promise.all(
+				pokemonTypes.map((typeName) => getTypeDetails(typeName)),
+			);
+
+			const weaknessesSet = new Set();
+			detailsList.forEach((typeData) => {
+				const doubleDamageFrom = typeData?.damage_relations?.double_damage_from || [];
+				doubleDamageFrom.forEach((weakType) => {
+					if (weakType?.name) weaknessesSet.add(weakType.name);
+				});
+			});
+
+			const weaknesses = Array.from(weaknessesSet);
+			weaknessesByPokemon.value[pokemonName] = weaknesses;
+			return weaknesses;
+		} catch (err) {
+			console.error("getPokemonWeaknesses error:", err);
+			return [];
+		}
+	};
 
 	const fetchPokemons = async () => {
 		if (pokemons.value.length > 0) {
@@ -66,6 +148,10 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		isLoading,
 		hasError,
 		pokemonColorMap,
+		getPokemonSpecies,
+		getPokemonWeaknesses,
+		getTypeLabel,
+		getTypeColor,
 		fetchPokemons,
 	};
 });

@@ -1,7 +1,12 @@
 <template>
 	<div class="badge rounded-pill" :style="{ backgroundColor: color }">
 		<div class="type-icon">
-			<component :is="TypeIcon" :style="{ fill: color }" class="type-icon-svg" :aria-label="label" />
+			<component
+				:is="TypeIcon"
+				:style="{ fill: color }"
+				class="type-icon-svg"
+				:aria-label="label"
+			/>
 		</div>
 		<span class="type-label">{{ name }}</span>
 	</div>
@@ -26,7 +31,9 @@ const props = defineProps({
 	},
 });
 
-const TypeIcon = computed(() => defineAsyncComponent(() => import(`../../assets/icons/${props.label}.svg`)));
+const TypeIcon = computed(() =>
+	defineAsyncComponent(() => import(`../../assets/icons/${props.label}.svg`)),
+);
 </script>
 
 <style lang="scss" scoped>
