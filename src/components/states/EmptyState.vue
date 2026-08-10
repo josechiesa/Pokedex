@@ -1,14 +1,20 @@
 <template>
 	<div class="error-state-wrapper">
 		<div class="error-state text-center" role="alert">
-			<img :src="src" alt="No pudimos cargar los pokémon" class="state-image mb-3" />
+			<img
+				:src="src"
+				:alt="src"
+				:class="{ 'full-color': !fullColor }"
+				class="state-image mb-3"
+			/>
 			<h4 class="fw-semibold mb-2">
 				{{ title }}
 			</h4>
 			<p class="mb-3">
 				{{ label }}
 			</p>
-			<BaseButton v-if="showButton" label="Reintentar" @click="emit('click')" />
+			<slot name="extra"></slot>
+			<BaseButton v-if="showButton" :label="buttonLabel" @click="handleButtonClick" />
 		</div>
 	</div>
 </template>
@@ -16,7 +22,12 @@
 <script setup>
 import BaseButton from "@/components/UI/BaseButton.vue";
 
-const emit = defineEmits(["click"]);
+const emit = defineEmits(["click", "action"]);
+
+const handleButtonClick = () => {
+	emit("click");
+	emit("action");
+};
 
 defineProps({
 	showButton: {
@@ -31,9 +42,26 @@ defineProps({
 		type: String,
 		default: "",
 	},
+	buttonLabel: {
+		type: String,
+		default: "Reintentar",
+	},
 	src: {
 		type: String,
 		default: "/images/magikarp-error.png",
+	},
+	fullColor: {
+		type: Boolean,
+		default: false,
+	},
+	align: {
+		type: String,
+		default: "center",
+		validator: (value) => ["start", "center", "end"].includes(value),
+	},
+	sizeImage: {
+		type: String,
+		default: "215px",
 	},
 });
 </script>
@@ -51,21 +79,25 @@ defineProps({
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	justify-content: v-bind(align);
 	gap: 0.75rem;
 	text-align: center;
 	width: 100%;
 	max-width: 480px;
+	padding-bottom: 40px;
 }
 
 .state-image {
-	width: 185px;
-	height: 215px;
+	width: max-content;
+	height: v-bind(sizeImage);
 	object-fit: contain;
 	display: block;
 	margin: 0 auto;
-	filter: grayscale(100%);
+}
+
+.full-color {
 	opacity: 0.4;
+	filter: grayscale(100%);
 }
 
 h4 {
