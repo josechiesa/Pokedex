@@ -1,7 +1,5 @@
 # Pokedex
 
-This template should help get you started developing with Vue 3 in Vite.
-
 ## Resumen de tecnologías
 
 Para construir esta aplicación pensé en una arquitectura que priorizara rendimiento, reutilización y una experiencia fluida para el usuario. Utilicé Vue 3 con Vite para desarrollar una interfaz moderna y ágil, y Vue Router para manejar la navegación entre las distintas vistas. Para optimizar la carga de datos, implementé un scroll infinito que permite ir trayendo información de forma progresiva sin que la experiencia se sienta lenta o pesada.
