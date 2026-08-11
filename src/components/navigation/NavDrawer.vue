@@ -2,7 +2,12 @@
 	<aside class="nav-drawer">
 		<ul class="nav flex-column">
 			<li v-for="(link, key) in links" :key="key" class="nav-item mb-2">
-				<RouterLink :to="link.to" class="nav-link" active-class="active">
+				<RouterLink
+					:to="link.to"
+					class="nav-link"
+					active-class="active"
+					@click="emit('close')"
+				>
 					<component
 						:is="link.icon"
 						:style="{ fill: isActiveLink(link.to) ? '#1565C0' : '#424242' }"
@@ -24,6 +29,7 @@ import WorldIcon from "@/assets/icons/world.svg";
 import HeartFillIcon from "@/assets/icons/heart-fill.svg";
 import PerfilIcon from "@/assets/icons/perfil.svg";
 
+const emit = defineEmits(["close"]);
 const route = useRoute();
 
 const links = ref({

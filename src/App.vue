@@ -1,7 +1,8 @@
 <template>
 	<NavBar :drawer-open="drawerOpen" @toggle-drawer="toggleDrawer" />
 	<main class="app-layout d-flex">
-		<NavDrawer v-if="drawerVisible" />
+		<NavDrawer v-if="drawerVisible" @close="closeDrawer" />
+		<div v-if="isMobile && drawerOpen" class="drawer-backdrop" @click="closeDrawer"></div>
 		<section class="app-content flex-fill p-3">
 			<EmptyState
 				v-if="hasError"
@@ -115,6 +116,10 @@ const toggleDrawer = () => {
 	drawerOpen.value = !drawerOpen.value;
 };
 
+const closeDrawer = () => {
+	drawerOpen.value = false;
+};
+
 const handleModalAction = () => {
 	if (activeModalIndex.value < totalModalSteps.value - 1) {
 		activeModalIndex.value += 1;
@@ -141,6 +146,16 @@ const handleModalAction = () => {
 @media (max-width: 830px) {
 	.app-content {
 		margin-left: 0;
+	}
+
+	.drawer-backdrop {
+		position: fixed;
+		top: 56px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.25);
+		z-index: 2;
 	}
 }
 </style>

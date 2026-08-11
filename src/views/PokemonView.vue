@@ -27,6 +27,8 @@
 			</div>
 
 			<div ref="scrollSentinel" class="scroll-sentinel" aria-hidden="true"></div>
+
+			<ScrollTopButton :total-items="pokemons.length" />
 		</template>
 	</main>
 </template>
@@ -40,6 +42,7 @@ import PokemonCard from "@/components/PokemonCard.vue";
 import DropDown from "@/components/UI/DropDown.vue";
 import BulletPill from "@/components/UI/BulletPill.vue";
 import PokeLoader from "@/components/UI/PokeLoader.vue";
+import ScrollTopButton from "@/components/UI/ScrollTopButton.vue";
 
 const pokemonStore = usePokemonStore();
 const { pokemons, isLoading, hasMorePokemons, pokemonColorMap } = storeToRefs(pokemonStore);
@@ -67,7 +70,6 @@ const filteredPokemons = computed(() => {
 		pokemon.types.some((typeItem) => selectedTypes.value.includes(typeItem.type.name)),
 	);
 });
-
 // Registers the sentinel observer used to trigger infinite loading near the list end.
 const setupObserver = () => {
 	if (observer) {
@@ -85,7 +87,7 @@ const setupObserver = () => {
 		},
 		{
 			root: null,
-			rootMargin: "0px 0px 150px 0px",
+			rootMargin: "0px 0px 200px 0px",
 			threshold: 0.1,
 		},
 	);
