@@ -102,3 +102,10 @@ const visiblePageNumbers = computed(() => {
 	return Array.from({ length: chunkEnd - chunkStart + 1 }, (_, index) => chunkStart + index);
 });
 </script>
+
+<style scoped>
+.pagination {
+	flex-wrap: wrap;
+	row-gap: 0.5rem;
+}
+</style>
