@@ -46,8 +46,8 @@ const select = (nextIndex) => {
 }
 
 .dot-pagination__item {
-	width: 8px;
-	height: 8px;
+	width: 9px;
+	height: 9px;
 	border: none;
 	border-radius: 100%;
 	background-color: #d8dfef;
@@ -58,7 +58,8 @@ const select = (nextIndex) => {
 }
 
 .dot-pagination__item--active {
-	width: 24px;
+	width: 28px;
+	border-radius: 11px;
 	background-color: #2048a9;
 }
 </style>
