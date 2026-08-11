@@ -295,7 +295,7 @@ onUnmounted(() => {
 
 .pokemon-circle {
 	position: absolute;
-	top: -25%;
+	top: -240px;
 	left: 50%;
 	transform: translateX(-50%);
 	width: 500px;
@@ -345,7 +345,7 @@ onUnmounted(() => {
 	margin: 0 auto 1rem;
 	position: absolute;
 	transform: translate(-50%, -50%);
-	top: 25%;
+	top: 240px;
 	left: 50%;
 }
 

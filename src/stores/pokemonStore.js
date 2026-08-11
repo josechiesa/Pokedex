@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import {
 	getPokemonList,
-	getPokemonListByUrl,
 	getPokemonByName,
 	getPokemonSpecies as apiGetPokemonSpecies,
 	getPokemonType as apiGetPokemonType,
@@ -16,15 +15,7 @@ export const usePokemonStore = defineStore("pokemon", () => {
 	const pokemons = ref(Array.isArray(storedPokemons) ? storedPokemons : []);
 	const isLoading = ref(false);
 	const hasError = ref(false);
-	const pageLimit = ref(102);
-	const pageOffset = ref(0);
-	const totalPokemons = ref(0);
-	const nextPageUrl = ref(null);
-	const previousPageUrl = ref(null);
-	const currentPage = computed(() => Math.floor(pageOffset.value / pageLimit.value) + 1);
-	const totalPages = computed(() =>
-		Math.max(1, Math.ceil(totalPokemons.value / pageLimit.value)),
-	);
+	const totalPokemons = computed(() => pokemons.value.length);
 	const pokemonColorMap = ref([
 		{ name: "Acero", type: "steel", color: "#546E7A" },
 		{ name: "Agua", type: "water", color: "#2196F3" },
@@ -128,33 +119,8 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		}
 	};
 
-	// Extracts pagination params from a next/previous URL.
-	const parsePageParamsFromUrl = (url) => {
-		try {
-			const parsedUrl = new URL(url);
-			const limitParam = Number(parsedUrl.searchParams.get("limit"));
-			const offsetParam = Number(parsedUrl.searchParams.get("offset"));
-
-			return {
-				limit: Number.isFinite(limitParam) && limitParam > 0 ? limitParam : pageLimit.value,
-				offset: Number.isFinite(offsetParam) && offsetParam >= 0 ? offsetParam : 0,
-			};
-		} catch {
-			return {
-				limit: pageLimit.value,
-				offset: pageOffset.value,
-			};
-		}
-	};
-
-	// Applies a paginated response and resolves full pokemon details for the current page.
-	const applyPokemonPage = async (responseData, limit, offset) => {
-		totalPokemons.value = responseData?.count ?? 0;
-		nextPageUrl.value = responseData?.next ?? null;
-		previousPageUrl.value = responseData?.previous ?? null;
-		pageLimit.value = limit;
-		pageOffset.value = offset;
-
+	// Resolves full pokemon details from a list response.
+	const applyPokemonList = async (responseData) => {
 		const basicList = responseData?.results ?? [];
 		const detailPromises = basicList.map((pokemon) => getPokemonByName(pokemon.name));
 		const settled = await Promise.allSettled(detailPromises);
@@ -167,59 +133,20 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		savePokemons(pokemons.value);
 	};
 
-	// Fetches a pokemon page using limit and offset.
-	const fetchPokemons = async (limit = pageLimit.value, offset = 0) => {
+	// Fetches the first 151 pokemon in a single request.
+	const fetchPokemons = async () => {
 		isLoading.value = true;
 		hasError.value = false;
 
 		try {
-			const response = await getPokemonList(limit, offset);
-			await applyPokemonPage(response?.data, limit, offset);
+			const response = await getPokemonList(151, 0);
+			await applyPokemonList(response?.data);
 		} catch (err) {
 			console.error("fetchPokemons error:", err);
 			hasError.value = true;
 		} finally {
 			isLoading.value = false;
 		}
-	};
-
-	// Fetches a pokemon page directly from a pagination URL.
-	const fetchPokemonsByUrl = async (url = "") => {
-		if (!url) return;
-
-		isLoading.value = true;
-		hasError.value = false;
-
-		const { limit, offset } = parsePageParamsFromUrl(url);
-
-		try {
-			const response = await getPokemonListByUrl(url);
-			await applyPokemonPage(response?.data, limit, offset);
-		} catch (err) {
-			console.error("fetchPokemonsByUrl error:", err);
-			hasError.value = true;
-		} finally {
-			isLoading.value = false;
-		}
-	};
-
-	// Navigates to the next page when available.
-	const goToNextPage = async () => {
-		if (!nextPageUrl.value) return;
-		await fetchPokemonsByUrl(nextPageUrl.value);
-	};
-
-	// Navigates to the previous page when available.
-	const goToPreviousPage = async () => {
-		if (!previousPageUrl.value) return;
-		await fetchPokemonsByUrl(previousPageUrl.value);
-	};
-
-	// Navigates to a specific page number using current page size.
-	const goToPage = async (page = 1) => {
-		const safePage = Math.min(Math.max(Number(page) || 1, 1), totalPages.value);
-		const offset = (safePage - 1) * pageLimit.value;
-		await fetchPokemons(pageLimit.value, offset);
 	};
 
 	// Searches a pokemon by name or id-compatible query.
@@ -240,23 +167,13 @@ export const usePokemonStore = defineStore("pokemon", () => {
 		pokemons,
 		isLoading,
 		hasError,
-		pageLimit,
-		pageOffset,
 		totalPokemons,
-		nextPageUrl,
-		previousPageUrl,
-		currentPage,
-		totalPages,
 		pokemonColorMap,
 		getPokemonSpecies,
 		getPokemonWeaknesses,
 		getTypeLabel,
 		getTypeColor,
 		fetchPokemons,
-		fetchPokemonsByUrl,
-		goToNextPage,
-		goToPreviousPage,
-		goToPage,
 		searchPokemon,
 	};
 });

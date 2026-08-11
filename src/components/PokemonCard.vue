@@ -81,6 +81,13 @@ const showInOffcanvas = () => {
 	min-height: stretch;
 	width: 100%;
 	cursor: pointer;
+
+	transition: scale 0.2s ease-in-out;
+}
+
+.pokemon-card:hover {
+	scale: 1.02;
+	transition: scale 0.2s ease-in-out;
 }
 
 .card-content {

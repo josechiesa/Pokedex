@@ -38,6 +38,12 @@ defineProps({
 	position: absolute;
 	top: 8px;
 	right: 8px;
+	transition: scale 0.2s ease-in-out;
+}
+
+.favorite-btn:hover {
+	scale: 1.05;
+	transition: scale 0.2s ease-in-out;
 }
 
 .favorite-btn--inline {

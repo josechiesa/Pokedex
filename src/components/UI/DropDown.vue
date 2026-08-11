@@ -8,10 +8,7 @@
 			size="small"
 		>
 			<span>{{ placeholder }}</span>
-			<span v-if="model.length" class=" text-light ms-2">{{
-				model.length
-			}}</span>
-
+			<span v-if="model.length" class="text-light ms-2">{{ model.length }}</span>
 		</BaseButton>
 		<ul class="dropdown-menu p-3 type-dropdown-menu">
 			<li class="clear-filter" @click.stop.prevent="model = []">Borrar filtro</li>
@@ -70,6 +67,10 @@ const model = defineModel();
 	}
 }
 
+li {
+	cursor: pointer;
+}
+
 .dropdown-item {
 	padding: 0.35rem 0.75rem;
 }
@@ -85,6 +86,5 @@ const model = defineModel();
 	font-size: 14px;
 	text-decoration: underline;
 	text-align: center;
-	cursor: pointer;
 }
 </style>
