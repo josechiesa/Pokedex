@@ -7,39 +7,38 @@ import {
 	getPokemonType as apiGetPokemonType,
 } from "@/services/api";
 import { useLocalStorage } from "@/composables/useLocalStorage";
+import {
+	POKEMON_BATCH_SIZE,
+	POKEMON_COLOR_MAP,
+	findPokemonInList,
+	normalizePokemonCacheList,
+	normalizeQuery,
+	upsertPokemons,
+} from "@/stores/pokemonStore.helpers";
 
 export const usePokemonStore = defineStore("pokemon", () => {
 	const { read: readStoredPokemons, save: savePokemons } = useLocalStorage("pokedex-list", []);
 
-	const storedPokemons = readStoredPokemons();
-	const pokemons = ref(Array.isArray(storedPokemons) ? storedPokemons : []);
+	const storedPokemons = normalizePokemonCacheList(readStoredPokemons());
+	const pokemons = ref(storedPokemons);
 	const isLoading = ref(false);
+	const isFetchingMore = ref(false);
 	const hasError = ref(false);
-	const totalPokemons = computed(() => pokemons.value.length);
-	const pokemonColorMap = ref([
-		{ name: "Acero", type: "steel", color: "#546E7A" },
-		{ name: "Agua", type: "water", color: "#2196F3" },
-		{ name: "Bicho", type: "bug", color: "#43A047" },
-		{ name: "Dragón", type: "dragon", color: "#00ACC1" },
-		{ name: "Eléctrico", type: "electric", color: "#FDD835" },
-		{ name: "Fantasma", type: "ghost", color: "#8E24AA" },
-		{ name: "Fuego", type: "fire", color: "#FF9800" },
-		{ name: "Hada", type: "fairy", color: "#E91E63" },
-		{ name: "Hielo", type: "ice", color: "#3D8BFF" },
-		{ name: "Lucha", type: "fighting", color: "#E53935" },
-		{ name: "Normal", type: "normal", color: "#546E7A" },
-		{ name: "Planta", type: "grass", color: "#8BC34A" },
-		{ name: "Psíquico", type: "psychic", color: "#673AB7" },
-		{ name: "Roca", type: "rock", color: "#795548" },
-		{ name: "Siniestro", type: "dark", color: "#546E7A" },
-		{ name: "Tierra", type: "ground", color: "#FFB300" },
-		{ name: "Veneno", type: "poison", color: "#9C27B0" },
-		{ name: "Volador", type: "flying", color: "#00BCD4" },
-	]);
+	const canLoadMore = ref(true);
+	const nextOffset = ref(storedPokemons.length);
+	const hasMorePokemons = computed(() => canLoadMore.value);
+	const pokemonColorMap = ref(POKEMON_COLOR_MAP);
 
 	const species = ref({});
 	const typeDetails = ref({});
 	const weaknessesByPokemon = ref({});
+
+	// Persists the merged pokemon cache and advances the next API offset cursor.
+	const persistPokemonCache = (cachedPokemons, offset = nextOffset.value) => {
+		pokemons.value = Array.isArray(cachedPokemons) ? cachedPokemons : [];
+		savePokemons(pokemons.value);
+		nextOffset.value = Math.max(0, offset);
+	};
 
 	// Fetches and caches species details for a pokemon.
 	const getPokemonSpecies = async (name = "") => {
@@ -120,43 +119,90 @@ export const usePokemonStore = defineStore("pokemon", () => {
 	};
 
 	// Resolves full pokemon details from a list response.
-	const applyPokemonList = async (responseData) => {
+	const applyPokemonList = async (responseData, offset = nextOffset.value) => {
 		const basicList = responseData?.results ?? [];
-		const detailPromises = basicList.map((pokemon) => getPokemonByName(pokemon.name));
-		const settled = await Promise.allSettled(detailPromises);
+		canLoadMore.value = Boolean(responseData?.next);
+		const cachedByName = new Map(pokemons.value.map((pokemon) => [pokemon.name, pokemon]));
+		const detailPromises = basicList.map(async (pokemon) => {
+			const cachedPokemon = cachedByName.get(pokemon.name);
+			if (cachedPokemon) return cachedPokemon;
 
-		const successful = settled
-			.filter((result) => result.status === "fulfilled" && result.value && result.value.data)
-			.map((result) => result.value.data);
+			try {
+				const response = await getPokemonByName(pokemon.name);
+				return response?.data ?? null;
+			} catch (err) {
+				console.error("applyPokemonList item error:", err);
+				return null;
+			}
+		});
 
-		pokemons.value = successful;
-		savePokemons(pokemons.value);
+		const successful = (await Promise.all(detailPromises)).filter(Boolean);
+		const merged = upsertPokemons(pokemons.value, successful);
+		persistPokemonCache(merged, offset + basicList.length);
 	};
 
-	// Fetches the first 151 pokemon in a single request.
+	// Loads one list batch from the API and applies it to the local cache.
+	const loadPokemonBatch = async (offset = 0) => {
+		const response = await getPokemonList(POKEMON_BATCH_SIZE, offset);
+		await applyPokemonList(response?.data, offset);
+	};
+
+	// Fetches the next batch of pokemon from the list endpoint.
 	const fetchPokemons = async () => {
+		if (isLoading.value || isFetchingMore.value) return pokemons.value;
+
 		isLoading.value = true;
 		hasError.value = false;
 
 		try {
-			const response = await getPokemonList(151, 0);
-			await applyPokemonList(response?.data);
+			await loadPokemonBatch(nextOffset.value);
+
+			return pokemons.value;
 		} catch (err) {
 			console.error("fetchPokemons error:", err);
 			hasError.value = true;
+			return pokemons.value;
 		} finally {
 			isLoading.value = false;
 		}
 	};
 
+	// Fetches the next batch when the user reaches the end of the grid.
+	const fetchMorePokemons = async () => {
+		if (isLoading.value || isFetchingMore.value || !hasMorePokemons.value)
+			return pokemons.value;
+
+		isFetchingMore.value = true;
+		hasError.value = false;
+
+		try {
+			await loadPokemonBatch(nextOffset.value);
+			return pokemons.value;
+		} catch (err) {
+			console.error("fetchMorePokemons error:", err);
+			hasError.value = true;
+			return pokemons.value;
+		} finally {
+			isFetchingMore.value = false;
+		}
+	};
+
 	// Searches a pokemon by name or id-compatible query.
 	const searchPokemon = async (query = "") => {
-		const normalizedQuery = String(query).trim().toLowerCase().replace(/^#/, "");
+		const cachedPokemon = findPokemonInList(pokemons.value, query);
+		if (cachedPokemon) return cachedPokemon;
+
+		const normalizedQuery = normalizeQuery(query);
 		if (!normalizedQuery) return null;
 
 		try {
 			const response = await getPokemonByName(normalizedQuery);
-			return response?.data || null;
+			const rawPokemon = response?.data ?? null;
+			if (!rawPokemon) return null;
+
+			const merged = upsertPokemons(pokemons.value, [rawPokemon]);
+			persistPokemonCache(merged, nextOffset.value);
+			return findPokemonInList(merged, normalizedQuery);
 		} catch (err) {
 			console.error("searchPokemon error:", err);
 			return null;
@@ -166,14 +212,16 @@ export const usePokemonStore = defineStore("pokemon", () => {
 	return {
 		pokemons,
 		isLoading,
+		isFetchingMore,
 		hasError,
-		totalPokemons,
+		hasMorePokemons,
 		pokemonColorMap,
 		getPokemonSpecies,
 		getPokemonWeaknesses,
 		getTypeLabel,
 		getTypeColor,
 		fetchPokemons,
+		fetchMorePokemons,
 		searchPokemon,
 	};
 });

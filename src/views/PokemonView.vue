@@ -1,6 +1,6 @@
 <template>
 	<main>
-		<template v-if="isLoading">
+		<template v-if="isLoading && !pokemons.length">
 			<PokeLoader :size="88" />
 		</template>
 		<template v-else>
@@ -25,12 +25,14 @@
 					:pokemon="pokemon"
 				/>
 			</div>
+
+			<div ref="scrollSentinel" class="scroll-sentinel" aria-hidden="true"></div>
 		</template>
 	</main>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { usePokemonStore } from "@/stores/pokemonStore";
 
@@ -40,17 +42,22 @@ import BulletPill from "@/components/UI/BulletPill.vue";
 import PokeLoader from "@/components/UI/PokeLoader.vue";
 
 const pokemonStore = usePokemonStore();
-const { pokemons, isLoading, pokemonColorMap } = storeToRefs(pokemonStore);
-const { fetchPokemons } = pokemonStore;
+const { pokemons, isLoading, hasMorePokemons, pokemonColorMap } = storeToRefs(pokemonStore);
+const { fetchPokemons, fetchMorePokemons } = pokemonStore;
 
 const selectedTypes = ref([]);
+const scrollSentinel = ref(null);
+let observer = null;
 
+// Exposes all available type options from the store.
 const typeOptions = computed(() => pokemonColorMap.value || []);
 
+// Maps the selected type keys to their full option objects.
 const selectedTypeOptions = computed(() =>
 	typeOptions.value.filter((type) => selectedTypes.value.includes(type.type)),
 );
 
+// Filters the pokemon list by selected types, or returns all when no filter is active.
 const filteredPokemons = computed(() => {
 	if (!selectedTypes.value.length) {
 		return pokemons.value;
@@ -61,8 +68,44 @@ const filteredPokemons = computed(() => {
 	);
 });
 
-onMounted(() => {
-	fetchPokemons();
+// Registers the sentinel observer used to trigger infinite loading near the list end.
+const setupObserver = () => {
+	if (observer) {
+		observer.disconnect();
+		observer = null;
+	}
+
+	if (!scrollSentinel.value || !hasMorePokemons.value) return;
+
+	observer = new IntersectionObserver(
+		(entries) => {
+			if (entries.some((entry) => entry.isIntersecting)) {
+				fetchMorePokemons();
+			}
+		},
+		{
+			root: null,
+			rootMargin: "0px 0px 150px 0px",
+			threshold: 0.1,
+		},
+	);
+
+	observer.observe(scrollSentinel.value);
+};
+
+// Cleans up the observer when the view is destroyed.
+onBeforeUnmount(() => {
+	if (observer) observer.disconnect();
+});
+
+// Loads the first batch (if needed) and then starts observing the sentinel.
+onMounted(async () => {
+	if (!pokemons.value.length) {
+		await fetchPokemons();
+	}
+
+	await nextTick();
+	setupObserver();
 });
 </script>
 
@@ -72,6 +115,18 @@ onMounted(() => {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 1.5rem;
 	margin-top: 1.5rem;
+}
+
+.scroll-sentinel {
+	height: 50px;
+	width: 100%;
+	margin-top: 1rem;
+}
+
+.loading-more {
+	display: flex;
+	justify-content: center;
+	padding: 1.5rem 0 0;
 }
 
 .filter-bar {

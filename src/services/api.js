@@ -8,8 +8,12 @@ export const api = axios.create({
 	timeout: 10000,
 });
 
-export function getPokemonList() {
+export function getPokemonList(limit = 50, offset = 0) {
 	return api.get("/pokemon", {
+		params: {
+			limit,
+			offset,
+		},
 	});
 }
 
