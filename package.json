@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "homepage": "https://josechiesa.github.io/Pokedex/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

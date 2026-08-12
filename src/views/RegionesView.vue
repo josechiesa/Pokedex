@@ -2,7 +2,7 @@
 	<EmptyState
 		title="¡Muy pronto disponible!"
 		label="Estamos trabajando para traerte esta sección. Vuelve más adelante para descubrir todas las novedades."
-		src="/images/jigglypuff.png"
+		src="./images/jigglypuff.png"
 	/>
 </template>
 

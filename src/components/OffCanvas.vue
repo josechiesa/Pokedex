@@ -212,8 +212,8 @@ const genderItems = computed(() => {
 	if (!genderRate.value || !Array.isArray(genderRate.value)) return [];
 
 	return [
-		{ label: `${genderRate.value[0]}%`, icon: "/icons/male.png", alt: "Male" },
-		{ label: `${genderRate.value[1]}%`, icon: "/icons/female.png", alt: "Female" },
+		{ label: `${genderRate.value[0]}%`, icon: "./icons/male.png", alt: "Male" },
+		{ label: `${genderRate.value[1]}%`, icon: "./icons/female.png", alt: "Female" },
 	];
 });
 

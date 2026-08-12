@@ -71,7 +71,7 @@ const modalData = ref([
 	{
 		title: "Todos los Pokémon en un solo lugar",
 		label: "Accede a una amplia lista de Pokémon de todas las generaciones creadas por Nintendo",
-		src: "/images/ob-1.png",
+		src: "./images/ob-1.png",
 		buttonLabel: "Continuar",
 		fullColor: true,
 		showButton: true,
@@ -79,7 +79,7 @@ const modalData = ref([
 	{
 		title: "Mantén tu Pokédex actualizada",
 		label: "Regístrate y guarda tu perfil, Pokémon favoritos, configuraciones y mucho más en la aplicación",
-		src: "/images/ob-2.png",
+		src: "./images/ob-2.png",
 		buttonLabel: "Empecemos",
 		fullColor: true,
 		showButton: true,

@@ -1,7 +1,7 @@
 <template>
 	<div class="info-bullet">
 		<div class="info-bullet-header">
-			<img :src="`/icons/${icon}`" />
+			<img :src="`./icons/${icon}`" />
 			<span>{{ label }}</span>
 		</div>
 

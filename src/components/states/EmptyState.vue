@@ -48,7 +48,7 @@ defineProps({
 	},
 	src: {
 		type: String,
-		default: "/images/magikarp-error.png",
+		default: "./images/magikarp-error.png",
 	},
 	fullColor: {
 		type: Boolean,
