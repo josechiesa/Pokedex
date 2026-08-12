@@ -1,24 +1,40 @@
 <template>
-	<div class="poke-loader" role="status" aria-live="polite" aria-label="Cargando">
-		<loaderSvg class="poke-loader__image" />
+	<div :class="['poke-loader', { 'poke-loader--compact': compact }]">
+		<img class="poke-loader__image" :src="loaderSvgUrl" alt="" :width="size" :height="size" />
 	</div>
 </template>
 
 <script setup>
-import loaderSvg from "@/assets/icons/Loader.svg";
+import loaderSvgUrl from "@/assets/icons/Loader.svg?url";
+
+defineProps({
+	size: {
+		type: Number,
+		default: 88,
+	},
+	compact: {
+		type: Boolean,
+		default: false,
+	},
+});
 </script>
 
 <style scoped>
 .poke-loader {
 	width: 100%;
-	min-height: calc(100vh - 90px);
-	display: grid;
-	place-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	line-height: 0;
+}
+
+.poke-loader--compact {
+	padding: 0.5rem 0;
 }
 
 .poke-loader__image {
 	display: block;
-	object-fit: contain;
+	flex: 0 0 auto;
 	animation: poke-loader-spin 1.1s linear infinite;
 	will-change: transform;
 }

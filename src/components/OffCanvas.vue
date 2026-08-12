@@ -30,7 +30,10 @@
 				></button>
 			</div>
 			<div class="offcanvas-body">
-				<div v-if="activePokemon" class="pokemon-offcanvas">
+				<div v-if="isOffcanvasLoading" class="offcanvas-loader">
+					<PokeLoader :size="72" :compact="true" />
+				</div>
+				<div v-else-if="activePokemon" class="pokemon-offcanvas">
 					<div class="pokemon-offcanvas-top">
 						<img
 							:src="activePokemon.sprites?.other.showdown.front_default"
@@ -105,6 +108,7 @@ import BulletPill from "@/components/UI/BulletPill.vue";
 import InfoBullet from "@/components/UI/InfoBullet.vue";
 import SegmentedBar from "@/components/UI/SegmentedBar.vue";
 import FavButoon from "@/components/UI/FavButoon.vue";
+import PokeLoader from "@/components/UI/PokeLoader.vue";
 
 const activePokemon = ref(null);
 const species = ref(null);
@@ -115,6 +119,10 @@ const pokemonStore = usePokemonStore();
 const favoritesStore = useFavoritesStore();
 const { getTypeLabel, getTypeColor, getPokemonWeaknesses } = pokemonStore;
 const { pokemonColorMap } = storeToRefs(pokemonStore);
+
+const isOffcanvasLoading = computed(
+	() => !!activePokemon.value && (speciesLoading.value || weaknessesLoading.value),
+);
 
 const isActivePokemonFavorite = computed(() => {
 	if (!activePokemon.value?.id) return false;
@@ -279,6 +287,13 @@ onUnmounted(() => {
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow: hidden;
+}
+
+.offcanvas-loader {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .offcanvas-header {

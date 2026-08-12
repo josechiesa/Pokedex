@@ -26,6 +26,10 @@
 				/>
 			</div>
 
+			<div v-if="isFetchingMore" class="loading-more" aria-live="polite">
+				<PokeLoader :size="56" :compact="true" />
+			</div>
+
 			<div ref="scrollSentinel" class="scroll-sentinel" aria-hidden="true"></div>
 
 			<ScrollTopButton :total-items="pokemons.length" />
@@ -45,7 +49,8 @@ import PokeLoader from "@/components/UI/PokeLoader.vue";
 import ScrollTopButton from "@/components/UI/ScrollTopButton.vue";
 
 const pokemonStore = usePokemonStore();
-const { pokemons, isLoading, hasMorePokemons, pokemonColorMap } = storeToRefs(pokemonStore);
+const { pokemons, isLoading, isFetchingMore, hasMorePokemons, pokemonColorMap } =
+	storeToRefs(pokemonStore);
 const { fetchPokemons, fetchMorePokemons } = pokemonStore;
 
 const selectedTypes = ref([]);
