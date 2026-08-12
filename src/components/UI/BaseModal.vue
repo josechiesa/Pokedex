@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" :id="id" tabindex="-1" :aria-labelledby="labelId" aria-hidden="true">
+	<div class="modal fade" :id="id" tabindex="-1" :aria-labelledby="labelId" data-bs-backdrop="static" aria-hidden="true">
 		<div
 			class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
 			:class="dialogSizeClass"

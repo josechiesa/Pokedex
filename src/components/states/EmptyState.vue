@@ -14,7 +14,9 @@
 				{{ label }}
 			</p>
 			<slot name="extra"></slot>
-			<BaseButton v-if="showButton" :label="buttonLabel" @click="handleButtonClick" />
+			<slot name="button">
+				<BaseButton v-if="showButton" :label="buttonLabel" @click="handleButtonClick" />
+			</slot>
 		</div>
 	</div>
 </template>
@@ -85,6 +87,7 @@ defineProps({
 	width: 100%;
 	max-width: 480px;
 	padding-bottom: 40px;
+    height: stretch;
 }
 
 .state-image {

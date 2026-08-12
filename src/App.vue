@@ -22,13 +22,20 @@
 				v-bind="modal"
 				align="end"
 				size-image="300px"
-				@action="handleModalAction"
 			>
 				<template #extra>
 					<DotPagination
 						v-model="activeModalIndex"
 						:total="totalModalSteps"
 						class="mb-3"
+					/>
+				</template>
+				<template #button>
+					<BaseButton
+						v-if="modal.showButton"
+						:label="modal.buttonLabel"
+						@click="handleModalAction"
+						:data-bs-dismiss="modal.closeModal ? 'modal' : ''"
 					/>
 				</template>
 			</EmptyState>
@@ -51,6 +58,7 @@ import { useLocalStorage } from "@/composables/useLocalStorage";
 import EmptyState from "@/components/states/EmptyState.vue";
 import { usePokemonStore } from "@/stores/pokemonStore";
 import OffCanvas from "@/components/OffCanvas.vue";
+import BaseButton from "./components/UI/BaseButton.vue";
 
 const pokemonStore = usePokemonStore();
 const { hasError } = storeToRefs(pokemonStore);
@@ -75,6 +83,7 @@ const modalData = ref([
 		buttonLabel: "Continuar",
 		fullColor: true,
 		showButton: true,
+		closeModal: false,
 	},
 	{
 		title: "Mantén tu Pokédex actualizada",
@@ -83,6 +92,7 @@ const modalData = ref([
 		buttonLabel: "Empecemos",
 		fullColor: true,
 		showButton: true,
+		closeModal: true,
 	},
 ]);
 
